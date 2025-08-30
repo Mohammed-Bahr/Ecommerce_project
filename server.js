@@ -4,7 +4,7 @@ import cors from "cors";
 import userRouter from "./Routes/userRouter.js";
 import productRoute from "./Routes/productRoute.js";
 import { seedInitialProducts } from "./Services/prodectServices.js";
-
+import cartRoute from './Routes/cartRoute.js' 
 const app = express();
 
 // Middleware
@@ -22,11 +22,13 @@ mongoose.connect('mongodb://localhost:27017/ecommerce', {
 })
 .catch((error) => {
   console.error('MongoDB connection error:', error);
+  console.log('Make sure MongoDB is installed and running on localhost:27017');
 });
 
 // Routes
 app.use("/users", userRouter);
 app.use("/products", productRoute);
+app.use('/cart' ,  cartRoute )  
 
 app.get("/", (req, res) => {
   res.json({ message: "E-commerce API is running!" });

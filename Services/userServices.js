@@ -9,20 +9,20 @@ export const register = async ({
   email,
   password,
 }) => {
-  const findUser = await userModel.findOne({ email });
+    const findUser = await userModel.findOne({ email });
 
-  if (findUser) {
-    return { data: "User already exists!", statusCode: 400 };
-  }
+    if (findUser) {
+      return { data: "User already exists!", statusCode: 400 };
+    }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = new userModel({
-    email,
-    password: hashedPassword,
-    firstName,
-    lastName,
-  });
-  await newUser.save();
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new userModel({
+      email,
+      password: hashedPassword,
+      firstName,
+      lastName,
+    });
+    await newUser.save();
 
   return { data: generateJWT({ firstName, lastName, email }), statusCode: 200 };
 };
