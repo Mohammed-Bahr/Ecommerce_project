@@ -138,3 +138,40 @@ export const updateItemInCart = async ({ userID, productID, quantity }) => {
     };
   }
 };
+
+export const deleteItemInCart = async ({ userID, productID }) => {
+  try {
+    const cart = await getActiveCardForUser({ userID });
+    const existsInCart = cart.items.find(
+      (p) => p.product.toString() === productID
+    );
+    if (!existsInCart) {
+      return { data: "item does not exist in cart", statusCode: 400 };
+    }
+
+    const otherCartItems = cart.items.filter(
+      (p) => p.product.toString() !== productID
+    );
+
+    let total = otherCartItems.reduce((sum, product) => {
+      sum += product.quantity * product.unitPrice;
+      return sum;
+    }, 0);
+
+    cart.items = otherCartItems;
+    cart.totalAmount = total;
+
+    await cart.save();
+
+    return {
+      data: cart,
+      statusCode: 200,
+    };
+  } catch (error) {
+    console.error("Error updating cart item:", error);
+    return {
+      data: "something went wrong sorry try again",
+      statusCode: 500,
+    };
+  }
+};
