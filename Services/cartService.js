@@ -175,3 +175,24 @@ export const deleteItemInCart = async ({ userID, productID }) => {
     };
   }
 };
+
+export const clearItemInCart = async ({ userID }) => {
+  try {
+    const cart = await getActiveCardForUser({ userID });
+
+    cart.items = [];
+    cart.totalAmount = 0;
+
+    await cart.save();
+    return {
+      data: cart,
+      statusCode: 200,
+    };
+  } catch (error) {
+    console.error("Error clearing cart item:", error);
+    return {
+      data: `something went wrong sorry try again , ${error}` ,
+      statusCode: 500,
+    };
+  }
+};

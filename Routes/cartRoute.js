@@ -4,6 +4,7 @@ import {
   addItemToCart,
   updateItemInCart,
   deleteItemInCart,
+  clearItemInCart,
 } from "../Services/cartService.js";
 import validateJWT from "../validation/validateJWT.js";
 import { useId } from "react";
@@ -28,6 +29,10 @@ router.get("/", validateJWT, async (req, res) => {
 router.post("/items", validateJWT, async (req, res) => {
   const userID = req.user._id;
   const { productID, quantity } = req.body;
+  if(quantity === 0){
+    res.status(400).send("zero not valid");
+  }
+
   const response = await addItemToCart({ userID, productID, quantity });
   res.status(response.statusCode).send(response.data);
 });
@@ -35,6 +40,9 @@ router.post("/items", validateJWT, async (req, res) => {
 router.put("/items", validateJWT, async (req, res) => {
   const userID = req.user._id;
   const { productID, quantity } = req.body;
+  if(quantity === 0){
+    res.status(400).send("zero not valid");
+  }
   const response = await updateItemInCart({ userID, productID, quantity });
   res.status(response.statusCode).send(response.data);
 });
@@ -46,5 +54,10 @@ router.delete("/items/:productID", validateJWT, async (req, res) => {
   res.status(response.statusCode).send(response.data);
 });
 
+router.delete("/", validateJWT, async (req, res) => {
+  const userID = req.user._id;
+  const response = await clearItemInCart({ userID });
+  res.status(response.statusCode).send(response.data);
+});
 
 export default router;
