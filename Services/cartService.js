@@ -1,6 +1,6 @@
 import cartModel from "../Models/cartModel.js";
 import productModel from "../Models/productModel.js";
-
+import orderModel from "../Models/orderModel.js";
 const CreateCartForUser = {
   userID: String,
 };
@@ -191,7 +191,61 @@ export const clearItemInCart = async ({ userID }) => {
   } catch (error) {
     console.error("Error clearing cart item:", error);
     return {
-      data: `something went wrong sorry try again , ${error}` ,
+      data: `something went wrong sorry try again , ${error}`,
+      statusCode: 500,
+    };
+  }
+};
+
+export const checkout = async ({ userID, address }) => {
+  try {
+    if (!address) {
+      return { data: "please enter your address first", statusCode: 400 };
+    }
+    // if (!userID) {
+    //   return { data: "please enter your userID first", statusCode: 400 };
+    // }
+    //------------------------------------------------------------
+    const cart = await getActiveCardForUser({ userID });
+    const orderItems = [];
+    // loop cartItems to take each product and put it in order product
+    for (const item of cart.items) {
+      const product = await productModel.findById(item.product);
+      if (!product) {
+        return {
+          data: "product not found",
+          statusCode: 400,
+        };
+      }
+
+      const orderItem = {
+        productTitle: product.title,
+        productImage: product.image,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      };
+
+      orderItems.push(orderItem);
+    }
+    const order = await orderModel.create({
+      orderItems,
+      total: cart.totalAmount,
+      address,
+      userID,
+    });
+
+    await order.save();
+    //update the cart status to be completed
+    cart.status = "completed";
+    await cart.save();
+
+    return {
+      data: order,
+      statusCode: 200,
+    };
+  } catch (error) {
+    return {
+      data: `something went wrong sorry try again here is the error -> ${error}`,
       statusCode: 500,
     };
   }

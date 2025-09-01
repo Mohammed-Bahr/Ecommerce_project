@@ -5,9 +5,17 @@ import {
   updateItemInCart,
   deleteItemInCart,
   clearItemInCart,
+  checkout,
 } from "../Services/cartService.js";
 import validateJWT from "../validation/validateJWT.js";
 import { useId } from "react";
+
+
+//get : reads the incoming data without controling it , and data recived using url;
+//post : add to the mongos data , and data came as .body not url and this body have the shallow copy of the data;
+//put : updating the data 
+//delete : deleting the data
+
 
 const router = express.Router();
 
@@ -58,6 +66,20 @@ router.delete("/", validateJWT, async (req, res) => {
   const userID = req.user._id;
   const response = await clearItemInCart({ userID });
   res.status(response.statusCode).send(response.data);
+});
+
+
+
+router.post("/checkout" , validateJWT , async (req , res) => {
+  try{
+    const userID = req.user._id;
+    const {address} = req.body;
+    const response = await checkout({userID , address});
+    res.status(response.statusCode).send(response.data);
+
+  }catch(error){
+    res.status(500).send(`i'm really sorry but something went wrong, please try again (>_<) and here is the error -> ${error}` );
+  }
 });
 
 export default router;
