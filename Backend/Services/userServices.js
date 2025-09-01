@@ -1,7 +1,7 @@
 import userModel from "../Models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
+import "dotenv/config";
 export const register = async ({ firstName, lastName, email, password }) => {
   try {
     const findUser = await userModel.findOne({ email });
@@ -63,5 +63,5 @@ export const login = async ({ email, password }) => {
 };
 
 const generateJWT = (data) => {
-  return jwt.sign(data, "%%f!~LU|Jrwgdep[.z[[OGO:[{!6x(&b");
+  return jwt.sign(data, process.env.JWT_SECRET_KEY );
 };

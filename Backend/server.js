@@ -5,6 +5,10 @@ import userRouter from "./Routes/userRouter.js";
 import productRoute from "./Routes/productRoute.js";
 import { seedInitialProducts } from "./Services/prodectServices.js";
 import cartRoute from './Routes/cartRoute.js' 
+import  dotenv  from "dotenv";
+
+
+dotenv.config();
 const app = express();
 
 // Middleware
@@ -12,7 +16,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/ecommerce', {
+mongoose.connect(process.env.DB_LOCALHOST, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
