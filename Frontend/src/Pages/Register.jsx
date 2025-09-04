@@ -1,6 +1,7 @@
 import { Container, Box, Typography, TextField, Button } from '@mui/material'
 import React, { useRef, useState } from 'react'
 import { BaseUrl } from '../constants/BaseUrl';
+import { useAuth } from '../context/Auth/AuthContext';
 
 const Register = () => {
   const [error, setError] = useState("");
@@ -15,6 +16,8 @@ const Register = () => {
     return emailRegex.test(email);
   }
 
+  const { login } = useAuth();
+
   const onSubmit = async () => {
     const firstName = firstNameRef.current.value;
     const lastName = lastNameRef.current.value;
@@ -28,7 +31,7 @@ const Register = () => {
 
     const v = isValidEmail(email);
 
-    if(!v){
+    if (!v) {
       console.log('error email format');
       setError('Enter valid email');
       return;
@@ -49,23 +52,29 @@ const Register = () => {
         }),
       });
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.data || `Unable to register user, please try different credentials. Status: ${response.status}`);
+        return;
+      }
+
       const data = await response.json();
 
-      if (!response.ok) {
-        setError(data || `unable to register user, please try different credentials ${response.statusText}`);
-        return;
-      }
-
-      if (!data) {
-        setError("Incorrect token");
-        return;
-      }
-
+      // if (data && data.data) {
+      //   console.log("Registration successful:", data.data);
+      //   login(email, data.data); // Use email as username, data.data as token
+      //   setError(""); // Clear error on success
+      //   alert("Registration successful!");
+      // } else {
+      //   setError("Registration failed: Invalid response from server");
+      // }
       console.log("Registration successful:", data);
-      // You might want to redirect to login page or dashboard here
-      // Example: window.location.href = '/login';
+      login(email, data); // Use email as username, data.data as token
+      setError(""); // Clear error on success
+      alert("Registration successful!");
+
     } catch (err) {
-      console.log(`error shows while fetching data -> ${err}`);
+      console.log(`Error while fetching data -> ${err}`);
       setError(`Network error: ${err.message}`);
     }
 
