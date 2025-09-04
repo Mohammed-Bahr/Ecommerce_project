@@ -2,13 +2,18 @@ import { Container, Box, Typography, TextField, Button } from '@mui/material'
 import React, { useRef, useState } from 'react'
 import { BaseUrl } from '../constants/BaseUrl';
 
-const Register =  () => {
+const Register = () => {
   const [error, setError] = useState("");
   const firstNameRef = useRef(null);
   const lastNameRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
 
+
+  function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
 
   const onSubmit = async () => {
     const firstName = firstNameRef.current.value;
@@ -21,12 +26,20 @@ const Register =  () => {
       return;
     }
 
+    const v = isValidEmail(email);
+
+    if(!v){
+      console.log('error email format');
+      setError('Enter valid email');
+      return;
+    }
+
 
     try {
-      const response = await fetch(`http://localhost:3001/users/register` , {
-        method:"POST",
-        headers:{
-          "Content-Type" : "application/json",
+      const response = await fetch(`http://localhost:3001/users/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           firstName,
@@ -38,12 +51,12 @@ const Register =  () => {
 
       const data = await response.json();
 
-      if (!response.ok){
+      if (!response.ok) {
         setError(data || `unable to register user, please try different credentials ${response.statusText}`);
         return;
       }
 
-      if(!data){
+      if (!data) {
         setError("Incorrect token");
         return;
       }
@@ -55,6 +68,8 @@ const Register =  () => {
       console.log(`error shows while fetching data -> ${err}`);
       setError(`Network error: ${err.message}`);
     }
+
+    setError("");
 
   };
 
