@@ -21,16 +21,16 @@ const AuthProvider = ({ children }) => {
     localStorage.setItem(TOKEN_KEY, token);
   };
 
-//   const logout = () => {
-//     localStorage.removeItem(USERNAME_KEY);
-//     localStorage.removeItem(TOKEN_KEY);
-//     setUsername(null);
-//     setToken(null);
-//   };
+  const logout = () => {
+    localStorage.removeItem(USERNAME_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+    setUsername(null);
+    setToken(null);
+  };
 
   return (
     <AuthContext.Provider
-      value={{ username, token, isAuthenticated, login }}
+      value={{ username, token, isAuthenticated, login ,logout}}
     >
       {children}
     </AuthContext.Provider>

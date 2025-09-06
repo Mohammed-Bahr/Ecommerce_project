@@ -19,8 +19,7 @@ import { Grid } from '@mui/material';
 
 function ResponsiveAppBar() {
 
-  const settings = ['MyCart', 'Logout'];
-  const { username, isAuthenticated } = useAuth();
+  const { username, isAuthenticated ,logout } = useAuth();
   const navigate = useNavigate();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -47,6 +46,12 @@ function ResponsiveAppBar() {
 
   const handleRegister = () => {
     navigate("/register")
+  }
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+    handleCloseUserMenu();
   }
 
   return (
@@ -193,11 +198,12 @@ function ResponsiveAppBar() {
                   open={Boolean(anchorElUser)}
                   onClose={handleCloseUserMenu}
                 >
-                  {settings.map((setting) => (
-                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                      <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                  <MenuItem onClick={handleCloseUserMenu}>
+                      <Typography sx={{ textAlign: 'center' }}>My Orders</Typography>
                     </MenuItem>
-                  ))}
+                    <MenuItem onClick={handleLogout}>
+                      <Typography sx={{ textAlign: 'center' }}>Logout</Typography>
+                    </MenuItem>
                 </Menu>
               </>
             ) : (
