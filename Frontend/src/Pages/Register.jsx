@@ -2,14 +2,14 @@ import { Container, Box, Typography, TextField, Button } from '@mui/material'
 import React, { useRef, useState } from 'react'
 import { BaseUrl } from '../constants/BaseUrl';
 import { useAuth } from '../context/Auth/AuthContext';
-
+import { useNavigate } from 'react-router';
 const Register = () => {
   const [error, setError] = useState("");
   const firstNameRef = useRef(null);
   const lastNameRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
-
+  const navigate = useNavigate();
 
   function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -39,7 +39,7 @@ const Register = () => {
 
 
     try {
-      const response = await fetch(`http://localhost:3001/users/register`, {
+      const response = await fetch(`${BaseUrl}/users/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -50,11 +50,10 @@ const Register = () => {
           email,
           password,
         }),
-      });
+      })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        setError(errorData.data || `Unable to register user, please try different credentials. Status: ${response.status}`);
+        setError(`Unable to register user, please try different credentials. Status: ${response.status}`);
         return;
       }
 
@@ -69,16 +68,16 @@ const Register = () => {
       //   setError("Registration failed: Invalid response from server");
       // }
       console.log("Registration successful:", data);
-      login(email, data); // Use email as username, data.data as token
+      login(email, data); // Use email as username, data as token
       setError(""); // Clear error on success
       alert("Registration successful!");
+      navigate('/login');
 
     } catch (err) {
       console.log(`Error while fetching data -> ${err}`);
       setError(`Network error: ${err.message}`);
     }
 
-    setError("");
 
   };
 
