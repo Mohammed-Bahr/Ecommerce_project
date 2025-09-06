@@ -3,6 +3,10 @@ import React, { useRef, useState } from 'react'
 import { BaseUrl } from '../constants/BaseUrl';
 import { useAuth } from '../context/Auth/AuthContext';
 import { useNavigate } from 'react-router';
+import Alert from '@mui/material/Alert';
+import CheckIcon from '@mui/icons-material/Check';
+
+
 const Register = () => {
   const [error, setError] = useState("");
   const firstNameRef = useRef(null);
@@ -70,7 +74,9 @@ const Register = () => {
       console.log("Registration successful:", data);
       login(email, data); // Use email as username, data as token
       setError(""); // Clear error on success
-      alert("Registration successful!");
+      <Alert icon={<CheckIcon fontSize="inherit" />} severity="success">
+        Registration successful!
+      </Alert>
       navigate('/login');
 
     } catch (err) {

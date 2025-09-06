@@ -15,11 +15,13 @@ import AdbIcon from '@mui/icons-material/Adb';
 import { useAuth } from '../context/Auth/AuthContext';
 import { useNavigate } from 'react-router';
 import { Grid } from '@mui/material';
-
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import Badge from '@mui/material/Badge';
+import { styled } from '@mui/material/styles';
 
 function ResponsiveAppBar() {
 
-  const { username, isAuthenticated ,logout } = useAuth();
+  const { username, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -53,6 +55,19 @@ function ResponsiveAppBar() {
     navigate("/");
     handleCloseUserMenu();
   }
+
+  const handleCart = () => {
+    navigate('/cart');
+  }
+
+  const StyledBadge = styled(Badge)(({ theme }) => ({
+    '& .MuiBadge-badge': {
+      right: -3,
+      top: 13,
+      border: `2px solid ${(theme.vars ?? theme).palette.background.paper}`,
+      padding: '0 4px',
+    },
+  }));
 
   return (
     <AppBar position="static">
@@ -172,8 +187,14 @@ function ResponsiveAppBar() {
               }
             }
           }}>
+
             {isAuthenticated ? (
               <>
+                <IconButton aria-label="cart" onClick={handleCart}>
+                  <StyledBadge badgeContent={4} color="secondary">
+                    <AddShoppingCartIcon />
+                  </StyledBadge>
+                </IconButton>
                 <Typography sx={{ mr: 2, color: 'inherit' }}>
                   Welcome, {username}
                 </Typography>
@@ -199,35 +220,35 @@ function ResponsiveAppBar() {
                   onClose={handleCloseUserMenu}
                 >
                   <MenuItem onClick={handleCloseUserMenu}>
-                      <Typography sx={{ textAlign: 'center' }}>My Orders</Typography>
-                    </MenuItem>
-                    <MenuItem onClick={handleLogout}>
-                      <Typography sx={{ textAlign: 'center' }}>Logout</Typography>
-                    </MenuItem>
+                    <Typography sx={{ textAlign: 'center' }}>My Orders</Typography>
+                  </MenuItem>
+                  <MenuItem onClick={handleLogout}>
+                    <Typography sx={{ textAlign: 'center' }}>Logout</Typography>
+                  </MenuItem>
                 </Menu>
               </>
             ) : (
               <Box sx={{
-            flexGrow: 0, ml: 'auto', display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            gap: 2,
-            padding: { xs: 1, md: 2 },
-            '& .MuiTypography-root': {
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                color: '#e3f2fd',
-                transform: 'scale(1.02)'
-              }
-            },
-            '& .MuiSvgIcon-root': {
-              fontSize: { xs: '1.5rem', md: '2rem' },
-              transition: 'transform 0.3s ease',
-              '&:hover': {
-                transform: 'rotate(360deg)'
-              }
-            }
-          }}>
+                flexGrow: 0, ml: 'auto', display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                gap: 2,
+                padding: { xs: 1, md: 2 },
+                '& .MuiTypography-root': {
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    color: '#e3f2fd',
+                    transform: 'scale(1.02)'
+                  }
+                },
+                '& .MuiSvgIcon-root': {
+                  fontSize: { xs: '1.5rem', md: '2rem' },
+                  transition: 'transform 0.3s ease',
+                  '&:hover': {
+                    transform: 'rotate(360deg)'
+                  }
+                }
+              }}>
                 <Button
                   variant="contained"
                   color="success"

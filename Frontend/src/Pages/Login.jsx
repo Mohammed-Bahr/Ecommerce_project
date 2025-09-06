@@ -3,8 +3,13 @@ import React, { useRef, useState } from 'react'
 import { BaseUrl } from '../constants/BaseUrl';
 import { useAuth } from '../context/Auth/AuthContext';
 import { useNavigate } from 'react-router';
+import Alert from '@mui/material/Alert';
+import CheckIcon from '@mui/icons-material/Check';
+
 const Login = () => {
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState(false);
+
     const emailRef = useRef(null);
     const passwordRef = useRef(null);
     const navigate = useNavigate();
@@ -17,7 +22,6 @@ const Login = () => {
     const { login } = useAuth();
 
     const onSubmit = async () => {
-
         const email = emailRef.current.value;
         const password = passwordRef.current.value;
 
@@ -57,16 +61,20 @@ const Login = () => {
             console.log("login successful:", data);
             login(email, data); // Use email as username, data.data as token
             setError(""); // Clear error on success
-            alert("login successful!");
+            setSuccess(true);
+
 
         } catch (err) {
             console.log(`Error while fetching data -> ${err}`);
             setError(`Network error: ${err.message}`);
+
         }
 
         setError("");
 
-        navigate("/")
+        setTimeout(() => {
+            navigate("/");
+        }, 1500);
 
     };
 
@@ -101,10 +109,24 @@ const Login = () => {
                         label="Password"
                         name="password"
                     />
-                    <Button onClick={onSubmit} variant="contained">
+                    <Button onClick={
+                        onSubmit
+                    } variant="contained">
                         Login
                     </Button>
-                    {error && <Typography sx={{ color: "red" }}>{error}</Typography>}
+                    {error && (
+                        <Alert severity="error">
+                            {error}
+                        </Alert>
+                    )}
+                    {success && (
+                        <Alert
+                            icon={<CheckIcon fontSize="inherit" />}
+                            severity="success"
+                        >
+                            Login successful! Redirecting...
+                        </Alert>
+                    )}
                 </Box>
             </Box>
         </Container>
