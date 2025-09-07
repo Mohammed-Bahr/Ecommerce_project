@@ -10,7 +10,8 @@ import {
     IconButton,
     Grid,
     Divider,
-    Alert
+    Alert,
+    TextField
 } from '@mui/material';
 import { Add, Remove, Delete } from '@mui/icons-material';
 import { BaseUrl } from '../constants/BaseUrl'
@@ -22,6 +23,8 @@ const Cart = () => {
     const [cart, setCart] = useState(null);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
+    const [address, setAddress] = useState('');
+    const [checkoutLoading, setCheckoutLoading] = useState(false);
 
     const fetchCart = async () => {
         if (!token) {
@@ -94,6 +97,38 @@ const Cart = () => {
         }
     };
 
+    const handleCheckout = async () => {
+        if (!address.trim()) {
+            setError('Please enter your address');
+            return;
+        }
+
+        setCheckoutLoading(true);
+        try {
+            const response = await fetch(`${BaseUrl}/cart/checkout`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ address })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                alert('Order placed successfully!');
+                setCart({ items: [], totalAmount: 0 }); // Clear cart display
+                setAddress('');
+            } else {
+                const errorData = await response.json();
+                setError(errorData.message || 'Checkout failed');
+            }
+        } catch (err) {
+            setError('Network error during checkout');
+        } finally {
+            setCheckoutLoading(false);
+        }
+    };
     useEffect(() => {
         fetchCart();
     }, [token]);
@@ -110,6 +145,9 @@ const Cart = () => {
         return (
             <Container sx={{ mt: 4 }}>
                 <Alert severity="error">{error}</Alert>
+                <Button onClick={() => setError('')} sx={{ mt: 2 }}>
+                    Clear Error
+                </Button>
             </Container>
         );
     }
@@ -138,7 +176,7 @@ const Cart = () => {
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
                                             <Typography variant="h6">
-                                                Product ID: {item.product}
+                                                {item.product?.title || `Product ID: ${item.product}`}
                                             </Typography>
                                             <Typography variant="body1" color="text.secondary">
                                                 ${item.unitPrice}
@@ -147,7 +185,7 @@ const Cart = () => {
                                         
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <IconButton 
-                                                onClick={() => updateQuantity(item.product, item.quantity - 1)}
+                                                onClick={() => updateQuantity(item.product._id || item.product, item.quantity - 1)}
                                                 disabled={item.quantity <= 1}
                                             >
                                                 <Remove />
@@ -156,7 +194,7 @@ const Cart = () => {
                                                 {item.quantity}
                                             </Typography>
                                             <IconButton 
-                                                onClick={() => updateQuantity(item.product, item.quantity + 1)}
+                                                onClick={() => updateQuantity(item.product._id || item.product, item.quantity + 1)}
                                             >
                                                 <Add />
                                             </IconButton>
@@ -167,7 +205,7 @@ const Cart = () => {
                                         </Typography>
                                         
                                         <IconButton 
-                                            onClick={() => removeItem(item.product)}
+                                            onClick={() => removeItem(item.product._id || item.product)}
                                             color="error"
                                         >
                                             <Delete />
@@ -180,12 +218,30 @@ const Cart = () => {
                     
                     <Divider sx={{ my: 3 }} />
                     
+                    <Box sx={{ mb: 3 }}>
+                        <TextField
+                            fullWidth
+                            label="Delivery Address"
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            multiline
+                            rows={3}
+                            placeholder="Enter your full delivery address"
+                        />
+                    </Box>
+                    
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                         <Typography variant="h5">
                             Total: ${cart.totalAmount?.toFixed(2) || '0.00'}
                         </Typography>
-                        <Button variant="contained" color="primary" size="large">
-                            Proceed to Checkout
+                        <Button 
+                            variant="contained" 
+                            color="primary" 
+                            size="large"
+                            onClick={handleCheckout}
+                            disabled={checkoutLoading || !address.trim()}
+                        >
+                            {checkoutLoading ? 'Processing...' : 'Proceed to Checkout'}
                         </Button>
                     </Box>
                 </>
@@ -193,3 +249,5 @@ const Cart = () => {
         </Container>
     );
 };
+
+export default Cart;

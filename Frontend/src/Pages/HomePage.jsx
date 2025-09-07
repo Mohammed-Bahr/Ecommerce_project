@@ -3,8 +3,10 @@ import ProductCard from '../Components/ProductCard'
 import { Container } from '@mui/material'
 import {Grid} from '@mui/material'
 import { BaseUrl } from '../constants/BaseUrl'
+import { useAuth } from '../context/Auth/AuthContext'
 const HomePage = () => {
   const [products , setProducts] = useState([]);
+  const { isAuthenticated } = useAuth();
 
 
 
@@ -34,6 +36,11 @@ const HomePage = () => {
     fetchData();
   }, []);
 
+  const handleCartUpdate = () => {
+    // This function can be used to trigger cart updates in the navbar
+    // For now, we'll just log it, but you could implement a global state update here
+    console.log('Cart updated');
+  };
   
   if (!products || products.length === 0) return <div>Loading...</div>;
 
@@ -48,6 +55,7 @@ const HomePage = () => {
                 image={product.image} 
                 price={product.price} 
                 productId={product._id}
+                onCartUpdate={handleCartUpdate}
               />
             </Grid>
           ))

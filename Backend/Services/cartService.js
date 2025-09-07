@@ -25,7 +25,7 @@ const activeCard = {
 };
 export const getActiveCardForUser = async ({ userID }) => {
   try {
-    let cart = await cartModel.findOne({ userId: userID, status: "active" });
+    let cart = await cartModel.findOne({ userId: userID, status: "active" }).populate('items.product');
 
     if (!cart) {
       cart = await createCartForUser({ userID });
@@ -79,7 +79,6 @@ export const addItemToCart = async ({ userID, productID, quantity }) => {
     return {
       data: await getActiveCardForUser({ userID }),
       statusCode: 201,
-      cart: cart,
     };
   } catch (error) {
     return {
@@ -101,7 +100,6 @@ export const updateItemInCart = async ({ userID, productID, quantity }) => {
     if (!existsInCart) {
       return { data: "item does not exist in cart", statusCode: 400 };
     }
-    existsInCart.quantity = quantity;
 
     if (!product) {
       return { data: "Product not found!", statusCode: 400 };
@@ -110,6 +108,8 @@ export const updateItemInCart = async ({ userID, productID, quantity }) => {
     if (product.stock < quantity) {
       return { data: "Low stock for item", statusCode: 400 };
     }
+
+    existsInCart.quantity = quantity;
 
     const otherCartItems = cart.items.filter(
       (p) => p.product.toString() !== productID
@@ -127,7 +127,7 @@ export const updateItemInCart = async ({ userID, productID, quantity }) => {
     await cart.save();
 
     return {
-      data: await getActiveCardForUser({ userID, populateProduct: true }),
+      data: await getActiveCardForUser({ userID }),
       statusCode: 200,
     };
   } catch (error) {
