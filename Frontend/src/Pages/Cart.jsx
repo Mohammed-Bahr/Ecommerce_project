@@ -22,31 +22,54 @@ const Cart = () => {
     const [cart, setCart] = useState(null);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
-    const [address, setAddress] = useState('');
-    const [checkoutLoading, setCheckoutLoading] = useState(false);
 
+    const fetchCart = async () => {
         try {
+            setLoading(true);
+            setError('');
+            
             if(!token){
-                setError('missing token')
+                setError('missing token');
+                return;
             }
-            const fetchCart = async () => {
-                const response = await fetch(`${BaseUrl}/cart`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                if (!response.ok) {
-                    setError(`Faild to fetching user cart -> ${response.statusText}`)
+            
+            const response = await fetch(`${BaseUrl}/cart`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
+            });
+            
+            if (!response.ok) {
+                setError(`Failed to fetch user cart -> ${response.statusText}`);
+                return;
+            }
 
-                const data = await response.json();
-                setCart(data);
-            };
-
-            fetchCart();
+            const data = await response.json();
+            setCart(data);
         } catch (err) {
-            setError(err);
+            setError(err.message || 'An error occurred');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const updateQuantity = async (productId, quantity) => {
+        try {
+            const response = await fetch(`${BaseUrl}/cart/items`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ productId, quantity })
+            });
+
+            if (response.ok) {
+                fetchCart(); // Refresh cart
+            }
+        } catch (err) {
+            console.error('Error updating quantity:', err);
         }
     };
 
@@ -70,7 +93,7 @@ const Cart = () => {
 
     useEffect(() => {
         fetchCart();
-    }, [token]);
+    }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (loading) {
         return (
@@ -167,3 +190,5 @@ const Cart = () => {
         </Container>
     );
 };
+
+export default Cart;

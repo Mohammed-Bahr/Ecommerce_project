@@ -13,49 +13,23 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { useAuth } from '../context/Auth/AuthContext';
+import { useCart } from '../context/Cart/CartContext';
 import { useNavigate } from 'react-router';
 import { Grid } from '@mui/material';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import Badge from '@mui/material/Badge';
 import { styled } from '@mui/material/styles';
-import { useState as useStateReact, useEffect } from 'react';
-import { BaseUrl } from '../constants/BaseUrl';
 
 function ResponsiveAppBar() {
 
-  const { username, isAuthenticated, logout, token } = useAuth();
+  const { username, isAuthenticated, logout } = useAuth();
+  const { cartItems } = useCart();
   const navigate = useNavigate();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
-  const [cartItemCount, setCartItemCount] = useStateReact(0);
 
-  const fetchCartItemCount = async () => {
-    if (!token || !isAuthenticated) {
-      setCartItemCount(0);
-      return;
-    }
-
-    try {
-      const response = await fetch(`${BaseUrl}/cart`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (response.ok) {
-        const cart = await response.json();
-        const itemCount = cart.items?.reduce((total, item) => total + item.quantity, 0) || 0;
-        setCartItemCount(itemCount);
-      }
-    } catch (error) {
-      console.error('Error fetching cart count:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchCartItemCount();
-  }, [token, isAuthenticated]);
+  // Calculate cart item count from cart context
+  const cartItemCount = cartItems?.reduce((total, item) => total + item.quantity, 0) || 0;
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -83,7 +57,6 @@ function ResponsiveAppBar() {
 
   const handleLogout = () => {
     logout();
-    setCartItemCount(0);
     navigate("/");
     handleCloseUserMenu();
   }

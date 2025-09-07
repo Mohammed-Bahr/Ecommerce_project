@@ -26,7 +26,8 @@ const validateJWT = (req, res, next) => {
         }
         
         // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY , async (err , payload) => { //payload is the data that user enter to dataBase
+        const secretKey = process.env.JWT_SECRET_KEY || 'your-secret-key-here';
+        const decoded = jwt.verify(token, secretKey , async (err , payload) => { //payload is the data that user enter to dataBase
             if(err){
                 res.status(403).send('Invalid Token');
                 return; 

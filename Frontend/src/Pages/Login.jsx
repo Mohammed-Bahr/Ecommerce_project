@@ -59,22 +59,19 @@ const Login = () => {
 
             const data = await response.json();
             console.log("login successful:", data);
-            login(email, data); // Use email as username, data.data as token
+            login(email, data.data); // Use email as username, data.data as token
             setError(""); // Clear error on success
             setSuccess(true);
 
+            setTimeout(() => {
+                navigate("/");
+            }, 1500);
 
         } catch (err) {
             console.log(`Error while fetching data -> ${err}`);
             setError(`Network error: ${err.message}`);
-
+            return;
         }
-
-        setError("");
-
-        setTimeout(() => {
-            navigate("/");
-        }, 1500);
 
     };
 

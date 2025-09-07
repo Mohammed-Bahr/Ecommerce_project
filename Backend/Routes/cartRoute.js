@@ -1,5 +1,5 @@
 import express from "express";
-import { getActiveCardForUser } from "../Services/cartService.js";
+import { getActiveCartForUser } from "../Services/cartService.js";
 import {
   addItemToCart,
   updateItemInCart,
@@ -21,7 +21,7 @@ const router = express.Router();
 router.get("/", validateJWT, async (req, res) => {
   try {
     const userID = req.user._id;
-    const cart = await getActiveCardForUser({ userID });
+    const cart = await getActiveCartForUser({ userID, populateProduct: true });
     res.status(200).send(cart);
   } catch (error) {
     console.error("Cart route error:", error);
@@ -35,24 +35,24 @@ router.get("/", validateJWT, async (req, res) => {
 
 router.post("/items", validateJWT, async (req, res) => {
   const userID = req.user._id;
-  const { productID, quantity } = req.body;
+  const { productId, quantity } = req.body;
   if(quantity === 0){
     res.status(400).send("zero not valid");
     return;
   }
 
-  const response = await addItemToCart({ userID, productID, quantity });
+  const response = await addItemToCart({ userID, productID: productId, quantity });
   res.status(response.statusCode).send(response.data);
 });
 
 router.put("/items", validateJWT, async (req, res) => {
   const userID = req.user._id;
-  const { productID, quantity } = req.body;
+  const { productId, quantity } = req.body;
   if(quantity === 0){
     res.status(400).send("zero not valid");
     return;
   }
-  const response = await updateItemInCart({ userID, productID, quantity });
+  const response = await updateItemInCart({ userID, productID: productId, quantity });
   res.status(response.statusCode).send(response.data);
 });
 

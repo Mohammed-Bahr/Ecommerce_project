@@ -16,7 +16,8 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect(process.env.DB_LOCALHOST, {
+const mongoUri = process.env.DB_LOCALHOST || 'mongodb://localhost:27017/ecommerce';
+mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })

@@ -8,39 +8,62 @@ const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [error, setError] = useState("");
-  
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!token) {
+      setCartItems([]);
+      setTotalAmount(0);
+      setError("");
+      setLoading(false);
       return;
     }
 
     const fetchCart = async () => {
-      const response = await fetch(`${BaseUrl}/cart`, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-      });
+      try {
+        setLoading(true);
+        setError("");
+        
+        const response = await fetch(`${BaseUrl}/cart`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
 
-      if (!response.ok) {
-        setError("Failed to fetch user cart. Please try again");
-        return;
+        if (!response.ok) {
+          if (response.status === 403) {
+            setError("Please log in to view your cart");
+          } else {
+            setError("Failed to fetch user cart. Please try again");
+          }
+          return;
+        }
+
+        const cart = await response.json();
+
+        if (!cart || !cart.items) {
+          setError("Invalid cart data received");
+          return;
+        }
+
+        const cartItemsMapped = cart.items.map(
+          ({ product, quantity, unitPrice }) => ({
+            productId: product?._id,
+            title: product?.title,
+            image: product?.image,
+            quantity,
+            unitPrice,
+          })
+        );
+
+        setCartItems(cartItemsMapped);
+        setTotalAmount(cart.totalAmount || 0);
+      } catch (error) {
+        console.error("Error fetching cart:", error);
+        setError("Failed to load cart. Please try again");
+      } finally {
+        setLoading(false);
       }
-
-      const cart = await response.json();
-
-      const cartItemsMapped = cart.items.map(
-        ({ product, quantity, unitPrice }) => ({
-          productId: product._id,
-          title: product.title,
-          image: product.image,
-          quantity,
-          unitPrice,
-        })
-      );
-
-      setCartItems(cartItemsMapped);
-      setTotalAmount(cart.totalAmount);
     };
 
     fetchCart();
@@ -48,6 +71,9 @@ const CartProvider = ({ children }) => {
 
   const addItemToCart = async (productId) => {
     try {
+      setLoading(true);
+      setError("");
+      
       const response = await fetch(`${BaseUrl}/cart/items`, {
         method: "POST",
         headers: {
@@ -61,36 +87,42 @@ const CartProvider = ({ children }) => {
       });
 
       if (!response.ok) {
-        setError("Failed to add to cart");
+        setError("Failed to add item to cart. Please try again");
         return;
       }
 
       const cart = await response.json();
 
-      if (!cart) {
-        setError("Failed to parse cart data");
+      if (!cart || !cart.items) {
+        setError("Invalid cart data received");
         return;
       }
 
       const cartItemsMapped = cart.items.map(
         ({ product, quantity, unitPrice }) => ({
-          productId: product._id,
-          title: product.title,
-          image: product.image,
+          productId: product?._id,
+          title: product?.title,
+          image: product?.image,
           quantity,
           unitPrice,
         })
       );
 
       setCartItems(cartItemsMapped);
-      setTotalAmount(cart.totalAmount);
+      setTotalAmount(cart.totalAmount || 0);
     } catch (error) {
-      console.error(error);
+      console.error("Error adding item to cart:", error);
+      setError("Failed to add item to cart. Please try again");
+    } finally {
+      setLoading(false);
     }
   };
 
   const updateItemInCart = async (productId, quantity) => {
     try {
+      setLoading(true);
+      setError("");
+      
       const response = await fetch(`${BaseUrl}/cart/items`, {
         method: "PUT",
         headers: {
@@ -104,36 +136,42 @@ const CartProvider = ({ children }) => {
       });
 
       if (!response.ok) {
-        setError("Failed to update to cart");
+        setError("Failed to update cart item. Please try again");
         return;
       }
 
       const cart = await response.json();
 
-      if (!cart) {
-        setError("Failed to parse cart data");
+      if (!cart || !cart.items) {
+        setError("Invalid cart data received");
         return;
       }
 
       const cartItemsMapped = cart.items.map(
         ({ product, quantity, unitPrice }) => ({
-          productId: product._id,
-          title: product.title,
-          image: product.image,
+          productId: product?._id,
+          title: product?.title,
+          image: product?.image,
           quantity,
           unitPrice,
         })
       );
 
       setCartItems(cartItemsMapped);
-      setTotalAmount(cart.totalAmount);
+      setTotalAmount(cart.totalAmount || 0);
     } catch (err) {
-      console.error(err);
+      console.error("Error updating cart item:", err);
+      setError("Failed to update cart item. Please try again");
+    } finally {
+      setLoading(false);
     }
   };
 
   const removeItemInCart = async (productId) => {
     try {
+      setLoading(true);
+      setError("");
+      
       const response = await fetch(`${BaseUrl}/cart/items/${productId}`, {
         method: "DELETE",
         headers: {
@@ -142,36 +180,42 @@ const CartProvider = ({ children }) => {
       });
 
       if (!response.ok) {
-        setError("Failed to delete to cart");
+        setError("Failed to remove item from cart. Please try again");
         return;
       }
 
       const cart = await response.json();
 
-      if (!cart) {
-        setError("Failed to parse cart data");
+      if (!cart || !cart.items) {
+        setError("Invalid cart data received");
         return;
       }
 
       const cartItemsMapped = cart.items.map(
         ({ product, quantity, unitPrice }) => ({
-          productId: product._id,
-          title: product.title,
-          image: product.image,
+          productId: product?._id,
+          title: product?.title,
+          image: product?.image,
           quantity,
           unitPrice,
         })
       );
 
       setCartItems(cartItemsMapped);
-      setTotalAmount(cart.totalAmount);
+      setTotalAmount(cart.totalAmount || 0);
     } catch (error) {
-      console.error(error);
+      console.error("Error removing item from cart:", error);
+      setError("Failed to remove item from cart. Please try again");
+    } finally {
+      setLoading(false);
     }
   };
 
   const clearCart = async () => {
     try {
+      setLoading(true);
+      setError("");
+      
       const response = await fetch(`${BaseUrl}/cart`, {
         method: "DELETE",
         headers: {
@@ -180,21 +224,24 @@ const CartProvider = ({ children }) => {
       });
 
       if (!response.ok) {
-        setError("Failed to empty to cart");
+        setError("Failed to clear cart. Please try again");
         return;
       }
 
       const cart = await response.json();
 
       if (!cart) {
-        setError("Failed to parse cart data");
+        setError("Invalid response received");
         return;
       }
 
       setCartItems([]);
       setTotalAmount(0);
     } catch (error) {
-      console.error(error);
+      console.error("Error clearing cart:", error);
+      setError("Failed to clear cart. Please try again");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -204,6 +251,7 @@ const CartProvider = ({ children }) => {
         cartItems,
         totalAmount,
         error,
+        loading,
         addItemToCart,
         updateItemInCart,
         removeItemInCart,

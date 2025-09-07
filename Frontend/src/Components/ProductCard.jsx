@@ -6,13 +6,13 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { useAuth } from '../context/Auth/AuthContext';
-import { BaseUrl } from '../constants/BaseUrl';
+import { useCart } from '../context/Cart/CartContext';
 import { useState } from 'react';
 import { Alert, Snackbar } from '@mui/material';
 
 export default function ProductCard({title , image , price, productId, onCartUpdate}) {
   const { token } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const { addItemToCart, loading: cartLoading, error: cartError } = useCart();
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
 
   const handleAddToCart = async () => {
@@ -21,34 +21,19 @@ export default function ProductCard({title , image , price, productId, onCartUpd
       return;
     }
 
-    setLoading(true);
     try {
-      const response = await fetch(`${BaseUrl}/cart/items`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          productID: productId,
-          quantity: 1
-        })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
+      await addItemToCart(productId);
+      
+      if (cartError) {
+        setNotification({ open: true, message: cartError, severity: 'error' });
+      } else {
         setNotification({ open: true, message: 'Item added to cart successfully!', severity: 'success' });
         if (onCartUpdate) {
           onCartUpdate();
         }
-      } else {
-        setNotification({ open: true, message: data || 'Failed to add item to cart', severity: 'error' });
       }
     } catch (error) {
-      setNotification({ open: true, message: 'Network error. Please try again.', severity: 'error' });
-    } finally {
-      setLoading(false);
+      setNotification({ open: true, message: 'Failed to add item to cart. Please try again.', severity: 'error' });
     }
   };
 
@@ -76,11 +61,11 @@ export default function ProductCard({title , image , price, productId, onCartUpd
         <Button 
           size="small" 
           onClick={handleAddToCart}
-          disabled={loading}
+          disabled={cartLoading}
           variant="contained"
           color="primary"
         >
-          {loading ? 'Adding...' : 'Add To Cart'}
+          {cartLoading ? 'Adding...' : 'Add To Cart'}
         </Button>
       </CardActions>
     </Card>

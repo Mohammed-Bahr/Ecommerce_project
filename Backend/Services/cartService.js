@@ -24,12 +24,16 @@ const activeCard = {
   userID: String,
   populateProduct: Boolean,
 };
-export const getActiveCardForUser = async ({ userID , populateProduct }) => {
+export const getActiveCartForUser = async ({ userID , populateProduct }) => {
   try {
     let cart = await cartModel.findOne({ userId: userID, status: "active" });
 
     if (!cart) {
       cart = await createCartForUser({ userID });
+    }
+
+    if (populateProduct) {
+      cart = await cartModel.findOne({ userId: userID, status: "active" }).populate('items.product');
     }
 
     return cart;
@@ -41,8 +45,7 @@ export const getActiveCardForUser = async ({ userID , populateProduct }) => {
 
 export const addItemToCart = async ({ userID, productID, quantity }) => {
   try {
-    // Fixed typo: getActiveCardForUser -> getActiveCartForUser
-    const cart = await getActiveCardForUser({ userID });
+    const cart = await getActiveCartForUser({ userID });
 
     // Fixed typo: prodectID -> productID
     const existsInCart = cart.items.find(
@@ -77,8 +80,9 @@ export const addItemToCart = async ({ userID, productID, quantity }) => {
     // Save the updated cart
     await cart.save();
 
+    const populatedCart = await getActiveCartForUser({ userID, populateProduct: true });
     return {
-      data: await getActiveCardForUser({ userID }),
+      data: populatedCart,
       statusCode: 201,
     };
   } catch (error) {
@@ -92,7 +96,7 @@ export const addItemToCart = async ({ userID, productID, quantity }) => {
 
 export const updateItemInCart = async ({ userID, productID, quantity }) => {
   try {
-    const cart = await getActiveCardForUser({ userID });
+    const cart = await getActiveCartForUser({ userID });
     const existsInCart = cart.items.find(
       (p) => p.product.toString() === productID
     );
@@ -127,8 +131,9 @@ export const updateItemInCart = async ({ userID, productID, quantity }) => {
 
     await cart.save();
 
+    const populatedCart = await getActiveCartForUser({ userID, populateProduct: true });
     return {
-      data: await getActiveCardForUser({ userID }),
+      data: populatedCart,
       statusCode: 200,
     };
   } catch (error) {
@@ -142,7 +147,7 @@ export const updateItemInCart = async ({ userID, productID, quantity }) => {
 
 export const deleteItemInCart = async ({ userID, productID }) => {
   try {
-    const cart = await getActiveCardForUser({ userID });
+    const cart = await getActiveCartForUser({ userID });
     const existsInCart = cart.items.find(
       (p) => p.product.toString() === productID
     );
@@ -179,7 +184,7 @@ export const deleteItemInCart = async ({ userID, productID }) => {
 
 export const clearItemInCart = async ({ userID }) => {
   try {
-    const cart = await getActiveCardForUser({ userID });
+    const cart = await getActiveCartForUser({ userID });
 
     cart.items = [];
     cart.totalAmount = 0;
@@ -207,7 +212,7 @@ export const checkout = async ({ userID, address }) => {
     //   return { data: "please enter your userID first", statusCode: 400 };
     // }
     //------------------------------------------------------------
-    const cart = await getActiveCardForUser({ userID });
+    const cart = await getActiveCartForUser({ userID });
     const orderItems = [];
     // loop cartItems to take each product and put it in order product
     for (const item of cart.items) {
