@@ -4,9 +4,10 @@ import NavBar from './Components/NavBar'
 import Register from "./Pages/Register";
 import AuthProvider from "./context/Auth/AuthProvider";
 import Login from "./Pages/Login";
-import {motion , AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Cart from "./Pages/Cart";
 import ProtectedRoutes from "./Components/ProtectedRoutes";
+import CartProvider from "./context/Cart/CartProvider";
 // Create a wrapper component for the routes with animations
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -25,7 +26,7 @@ const AnimatedRoutes = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
 
-          <Route element={<ProtectedRoutes/>}>
+          <Route element={<ProtectedRoutes />}>
             <Route path="/cart" element={<Cart />} />
           </Route>
         </Routes>
@@ -36,11 +37,14 @@ const AnimatedRoutes = () => {
 
 function App() {
   return (
+
     <AuthProvider>
-      <BrowserRouter>
-        <NavBar />
-        <AnimatedRoutes />
-      </BrowserRouter>
+      <CartProvider>
+        <BrowserRouter>
+          <NavBar />
+          <AnimatedRoutes />
+        </BrowserRouter>
+      </CartProvider>
     </AuthProvider>
   );
 }

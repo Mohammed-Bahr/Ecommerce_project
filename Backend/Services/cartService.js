@@ -22,11 +22,16 @@ const createCartForUser = async ({ userID }) => {
 
 const activeCard = {
   userID: String,
+  populateProduct: Boolean,
 };
-export const getActiveCardForUser = async ({ userID }) => {
+export const getActiveCardForUser = async ({ userID , populateProduct }) => {
   try {
-    let cart = await cartModel.findOne({ userId: userID, status: "active" });
-
+    let cart ;
+    if(populateProduct){
+      cart =  await cartModel.findOne({ userId: userID, status: "active" }).populate("items.product");
+    }else{
+      cart = await cartModel.findOne({ userId: userID, status: "active" });
+    }
     if (!cart) {
       cart = await createCartForUser({ userID });
     }

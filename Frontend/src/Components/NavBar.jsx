@@ -69,6 +69,11 @@ function ResponsiveAppBar() {
     },
   }));
 
+
+  const ToHomePage = ()=>{
+    navigate('/');
+  }
+
   return (
     <AppBar position="static">
       <Container maxWidth="xl" >
@@ -110,6 +115,7 @@ function ResponsiveAppBar() {
                 color: 'inherit',
                 textDecoration: 'none',
               }}
+              onClick={ToHomePage}
             >
               MOHAMMED_BAHR_TEC
             </Typography>
@@ -160,6 +166,7 @@ function ResponsiveAppBar() {
                 color: 'inherit',
                 textDecoration: 'none',
               }}
+              onClick={ToHomePage}
             >
               MOHAMMED_BAHR_TEC
             </Typography>
