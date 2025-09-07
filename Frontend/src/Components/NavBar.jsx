@@ -18,13 +18,44 @@ import { Grid } from '@mui/material';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import Badge from '@mui/material/Badge';
 import { styled } from '@mui/material/styles';
+import { useState as useStateReact, useEffect } from 'react';
+import { BaseUrl } from '../constants/BaseUrl';
 
 function ResponsiveAppBar() {
 
-  const { username, isAuthenticated, logout } = useAuth();
+  const { username, isAuthenticated, logout, token } = useAuth();
   const navigate = useNavigate();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [cartItemCount, setCartItemCount] = useStateReact(0);
+
+  const fetchCartItemCount = async () => {
+    if (!token || !isAuthenticated) {
+      setCartItemCount(0);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${BaseUrl}/cart`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const cart = await response.json();
+        const itemCount = cart.items?.reduce((total, item) => total + item.quantity, 0) || 0;
+        setCartItemCount(itemCount);
+      }
+    } catch (error) {
+      console.error('Error fetching cart count:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCartItemCount();
+  }, [token, isAuthenticated]);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -52,6 +83,7 @@ function ResponsiveAppBar() {
 
   const handleLogout = () => {
     logout();
+    setCartItemCount(0);
     navigate("/");
     handleCloseUserMenu();
   }
@@ -198,7 +230,7 @@ function ResponsiveAppBar() {
             {isAuthenticated ? (
               <>
                 <IconButton aria-label="cart" onClick={handleCart}>
-                  <StyledBadge badgeContent={4} color="secondary">
+                  <StyledBadge badgeContent={cartItemCount} color="secondary">
                     <AddShoppingCartIcon />
                   </StyledBadge>
                 </IconButton>

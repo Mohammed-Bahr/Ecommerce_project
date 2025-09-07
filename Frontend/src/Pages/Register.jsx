@@ -9,6 +9,7 @@ import CheckIcon from '@mui/icons-material/Check';
 
 const Register = () => {
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
   const firstNameRef = useRef(null);
   const lastNameRef = useRef(null);
   const emailRef = useRef(null);
@@ -57,27 +58,21 @@ const Register = () => {
       })
 
       if (!response.ok) {
-        setError(`Unable to register user, please try different credentials. Status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.data || `Unable to register user, please try different credentials. Status: ${response.status}`);
         return;
       }
 
       const data = await response.json();
 
-      // if (data && data.data) {
-      //   console.log("Registration successful:", data.data);
-      //   login(email, data.data); // Use email as username, data.data as token
-      //   setError(""); // Clear error on success
-      //   alert("Registration successful!");
-      // } else {
-      //   setError("Registration failed: Invalid response from server");
-      // }
       console.log("Registration successful:", data);
       login(email, data); // Use email as username, data as token
       setError(""); // Clear error on success
-      <Alert icon={<CheckIcon fontSize="inherit" />} severity="success">
-        Registration successful!
-      </Alert>
-      navigate('/login');
+      setSuccess(true);
+      
+      setTimeout(() => {
+        navigate('/');
+      }, 1500);
 
     } catch (err) {
       console.log(`Error while fetching data -> ${err}`);
@@ -126,7 +121,19 @@ const Register = () => {
           <Button onClick={onSubmit} variant="contained">
             Register
           </Button>
-          {error && <Typography sx={{ color: "red" }}>{error}</Typography>}
+          {error && (
+            <Alert severity="error">
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert
+              icon={<CheckIcon fontSize="inherit" />}
+              severity="success"
+            >
+              Registration successful! Redirecting...
+            </Alert>
+          )}
         </Box>
       </Box>
     </Container>

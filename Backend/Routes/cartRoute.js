@@ -8,7 +8,6 @@ import {
   checkout,
 } from "../Services/cartService.js";
 import validateJWT from "../validation/validateJWT.js";
-import { useId } from "react";
 
 
 //get : reads the incoming data without controling it , and data recived using url;
@@ -39,6 +38,7 @@ router.post("/items", validateJWT, async (req, res) => {
   const { productID, quantity } = req.body;
   if(quantity === 0){
     res.status(400).send("zero not valid");
+    return;
   }
 
   const response = await addItemToCart({ userID, productID, quantity });
@@ -50,6 +50,7 @@ router.put("/items", validateJWT, async (req, res) => {
   const { productID, quantity } = req.body;
   if(quantity === 0){
     res.status(400).send("zero not valid");
+    return;
   }
   const response = await updateItemInCart({ userID, productID, quantity });
   res.status(response.statusCode).send(response.data);

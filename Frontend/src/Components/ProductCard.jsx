@@ -10,7 +10,7 @@ import { BaseUrl } from '../constants/BaseUrl';
 import { useState } from 'react';
 import { Alert, Snackbar } from '@mui/material';
 
-export default function ProductCard({title , image , price, productId}) {
+export default function ProductCard({title , image , price, productId, onCartUpdate}) {
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
@@ -39,6 +39,9 @@ export default function ProductCard({title , image , price, productId}) {
 
       if (response.ok) {
         setNotification({ open: true, message: 'Item added to cart successfully!', severity: 'success' });
+        if (onCartUpdate) {
+          onCartUpdate();
+        }
       } else {
         setNotification({ open: true, message: data || 'Failed to add item to cart', severity: 'error' });
       }
