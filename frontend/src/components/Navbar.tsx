@@ -48,7 +48,7 @@ function Navbar() {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={{ background: "linear-gradient(90deg, #1e3c72 0%, #2a5298 100%)", boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Box
@@ -80,8 +80,11 @@ function Navbar() {
                   sx={{
                     mr: 2,
                     display: { xs: "none", md: "flex" },
-                    fontFamily: "monospace",
+                    fontFamily: "'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
                     fontWeight: 700,
+                    letterSpacing: ".1rem",
+                    color: "inherit",
+                    textDecoration: "none",
                   }}
                 >
                   Tech Hub
@@ -89,7 +92,7 @@ function Navbar() {
               </Box>
             </Button>
             <Box
-              gap={4}
+              gap={2}
               display="flex"
               flexDirection="row"
               alignItems="center"
@@ -110,7 +113,7 @@ function Navbar() {
                       gap={2}
                     >
                       <Grid item>
-                        <Typography>{username}</Typography>
+                        <Typography sx={{ fontWeight: 600 }}>{username}</Typography>
                       </Grid>
                       <Grid item>
                         <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -147,13 +150,22 @@ function Navbar() {
                   </Menu>
                 </>
               ) : (
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={handleLogin}
-                >
-                  Login
-                </Button>
+                <Box display="flex" gap={1}>
+                  <Button
+                    variant="outlined"
+                    sx={{ color: 'white', borderColor: 'white', '&:hover': { borderColor: '#ddd', backgroundColor: 'rgba(255,255,255,0.1)' } }}
+                    onClick={handleLogin}
+                  >
+                    Login
+                  </Button>
+                  <Button
+                    variant="contained"
+                    sx={{ bgcolor: '#ff4081', '&:hover': { bgcolor: '#f50057' } }}
+                    onClick={() => navigate("/register")}
+                  >
+                    Register
+                  </Button>
+                </Box>
               )}
             </Box>
           </Box>

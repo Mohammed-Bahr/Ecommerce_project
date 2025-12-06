@@ -46,7 +46,12 @@ const RegisterPage = () => {
     });
 
     if (!response.ok) {
-      setError("Unable to register user, please try different credientials!");
+      try {
+        const errorData = await response.json();
+        setError(errorData);
+      } catch {
+        setError("Unable to register user, please try different credientials!");
+      }
       return;
     }
 

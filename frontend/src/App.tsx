@@ -13,8 +13,8 @@ import OrderSuccessPage from "./pages/OrderSuccessPage";
 function App() {
   return (
     <AuthProvider>
-      <CartProvider>
-        <BrowserRouter>
+      <BrowserRouter>
+        <CartProvider>
           <Navbar />
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -26,8 +26,8 @@ function App() {
               <Route path="/order-success" element={<OrderSuccessPage />} />
             </Route>
           </Routes>
-        </BrowserRouter>
-      </CartProvider>
+        </CartProvider>
+      </BrowserRouter>
     </AuthProvider>
   );
 }

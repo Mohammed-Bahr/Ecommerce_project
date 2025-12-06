@@ -3,9 +3,11 @@ import { CartContext } from "./CartContext";
 import { CartItem } from "../../types/CartItem";
 import { BASE_URL } from "../../constants/baseUrl";
 import { useAuth } from "../Auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const CartProvider: FC<PropsWithChildren> = ({ children }) => {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const [error, setError] = useState("");
@@ -56,6 +58,10 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const addItemToCart = async (productId: string) => {
     try {
+      if (!token) {
+        navigate("/login");
+        return;
+      }
       const response = await fetch(`${BASE_URL}/cart/items`, {
         method: "POST",
         headers: {
@@ -216,6 +222,8 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
       console.error(error);
     }
   };
+
+
 
   return (
     <CartContext.Provider
