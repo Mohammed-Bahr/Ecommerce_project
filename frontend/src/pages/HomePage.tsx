@@ -3,7 +3,7 @@ import Container from "@mui/material/Container";
 import ProductCard from "../components/ProductCard";
 import { useEffect, useState } from "react";
 import { Product } from "../types/Product";
-import { BASE_URL } from "../constants/baseUrl";
+// import { BASE_URL } from "../constants/baseUrl";
 import { Box } from "@mui/material";
 
 const HomePage = () => {
@@ -13,7 +13,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/product`);
+        const response = await fetch(`http://localhost:3001/product`);
         const data = await response.json();
         setProducts(data);
       } catch {
