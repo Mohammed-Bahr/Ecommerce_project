@@ -10,8 +10,6 @@ A modern, full-stack e-commerce web application built primarily with TypeScript,
   - [Backend](#backend)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
-- [Contributing](#contributing)
-- [License](#license)
 
 ---
 
@@ -142,18 +140,6 @@ Located in `backend/`, built with **Node.js** (TypeScript, Express):
     cd backend
     npm run dev
     ```
-
----
-
-## Contributing
-
-Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change. See [CONTRIBUTING.md](CONTRIBUTING.md) if available.
-
----
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
 
 ---
 
