@@ -5,6 +5,8 @@ import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useCart } from "../context/Cart/CartContext";
+import { useNavigate } from "react-router-dom";
+import { Box } from "@mui/material";
 
 interface Props {
   _id: string;
@@ -15,6 +17,7 @@ interface Props {
 
 export default function ProductCard({ _id, title, image, price }: Props) {
   const { addItemToCart } = useCart();
+  const navigate = useNavigate();
 
   return (
     <Card 
@@ -30,15 +33,20 @@ export default function ProductCard({ _id, title, image, price }: Props) {
         }
       }}
     >
-      <CardMedia sx={{ height: 200, objectFit: 'contain' }} image={image} title={title} />
-      <CardContent sx={{ flexGrow: 1 }}>
-        <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: 600, height: '3.6em', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {title}
-        </Typography>
-        <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
-          {price} EGP
-        </Typography>
-      </CardContent>
+      <Box 
+        onClick={() => navigate(`/product/${_id}`)}
+        sx={{ cursor: 'pointer', flexGrow: 1, display: 'flex', flexDirection: 'column' }}
+      >
+        <CardMedia sx={{ height: 200, objectFit: 'contain' }} image={image} title={title} />
+        <CardContent sx={{ flexGrow: 1 }}>
+          <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: 600, height: '3.6em', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {title}
+          </Typography>
+          <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
+            {price} EGP
+          </Typography>
+        </CardContent>
+      </Box>
       <CardActions sx={{ p: 2, pt: 0 }}>
         <Button 
           variant="contained" 

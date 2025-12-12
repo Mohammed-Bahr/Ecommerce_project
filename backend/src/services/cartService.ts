@@ -74,18 +74,18 @@ export const addItemToCart = async ({
   );
 
   if (existsInCart) {
-    return { data: "Item already exists in cart!", statusCode: 400 };
+    return { data: { error: "Item already exists in cart!" }, statusCode: 400 };
   }
 
   // Fetch the product
   const product = await productModel.findById(productId);
 
   if (!product) {
-    return { data: "Product not found!", statusCode: 400 };
+    return { data: { error: "Product not found!" }, statusCode: 400 };
   }
 
   if (product.stock < quantity) {
-    return { data: "Low stock for item", statusCode: 400 };
+    return { data: { error: "Low stock for item" }, statusCode: 400 };
   }
 
   cart.items.push({
@@ -123,17 +123,17 @@ export const updateItemInCart = async ({
   );
 
   if (!existsInCart) {
-    return { data: "Item does not exist in cart", statusCode: 400 };
+    return { data: { error: "Item does not exist in cart" }, statusCode: 400 };
   }
 
   const product = await productModel.findById(productId);
 
   if (!product) {
-    return { data: "Product not found!", statusCode: 400 };
+    return { data: { error: "Product not found!" }, statusCode: 400 };
   }
 
   if (product.stock < quantity) {
-    return { data: "Low stock for item", statusCode: 400 };
+    return { data: { error: "Low stock for item" }, statusCode: 400 };
   }
 
   const otherCartItems = cart.items.filter(
@@ -171,7 +171,7 @@ export const deleteItemIncart = async ({
   );
 
   if (!existsInCart) {
-    return { data: "Item does not exist in cart", statusCode: 400 };
+    return { data: { error: "Item does not exist in cart" }, statusCode: 400 };
   }
 
   const otherCartItems = cart.items.filter(
@@ -206,7 +206,7 @@ interface Checkout {
 }
 export const checkout = async ({ userId, address }: Checkout) => {
   if (!address) {
-    return { data: "Please add the address", statusCode: 400 };
+    return { data: { error: "Please add the address" }, statusCode: 400 };
   }
 
   const cart = await getActiveCartForUser({ userId });
@@ -218,7 +218,7 @@ export const checkout = async ({ userId, address }: Checkout) => {
     const product = await productModel.findById(item.product);
 
     if (!product) {
-      return { data: "Product not found", statusCode: 400 };
+      return { data: { error: "Product not found" }, statusCode: 400 };
     }
 
     const orderItem: IOrderItem = {

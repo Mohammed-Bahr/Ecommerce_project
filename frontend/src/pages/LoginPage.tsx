@@ -1,12 +1,8 @@
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
 import { useRef, useState } from "react";
+import { Box, Typography, Container, TextField, Button, Paper } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../constants/baseUrl";
 import { useAuth } from "../context/Auth/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [error, setError] = useState("");
@@ -14,84 +10,132 @@ const LoginPage = () => {
   const passwordRef = useRef<HTMLInputElement>(null);
 
   const navigate = useNavigate();
-
   const { login } = useAuth();
 
   const onSubmit = async () => {
     const email = emailRef.current?.value;
     const password = passwordRef.current?.value;
 
-    // Validate the form data
     if (!email || !password) {
-      setError("Check submitted data.");
+      setError("Please fill in all fields.");
       return;
     }
 
-    // Make the call to API to create the user
-    const response = await fetch(`${BASE_URL}/user/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    });
+    try {
+      const response = await fetch(`${BASE_URL}/user/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
-    if (!response.ok) {
-      setError("Unable to login user, please try different credientials!");
-      return;
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Unable to login");
+        return;
+      }
+
+      if (!data.accessToken) {
+        setError("Something went wrong. Please try again.");
+        return;
+      }
+
+      login(email, data.accessToken);
+      navigate("/");
+    } catch (err) {
+      setError("Unable to connect to the server. Please try again later.");
     }
-
-    const token = await response.json();
-
-    if (!token) {
-      setError("Incorrect token");
-      return;
-    }
-
-    login(email, token);
-    navigate("/");
   };
 
   return (
-    <Container>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          mt: 4,
-        }}
-      >
-        <Typography variant="h6">Login to Your Account</Typography>
-        <Box
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+        py: 4,
+      }}
+    >
+      <Container maxWidth="xs">
+        <Paper
+          elevation={6}
           sx={{
+            p: 4,
             display: "flex",
             flexDirection: "column",
-            gap: 2,
-            mt: 2,
-            border: 1,
-            borderColor: "#f5f5f5",
-            p: 2,
+            alignItems: "center",
+            borderRadius: 3,
+            background: "rgba(255, 255, 255, 0.95)",
+            backdropFilter: "blur(10px)",
           }}
         >
-          <TextField inputRef={emailRef} label="Email" name="email" />
-          <TextField
-            inputRef={passwordRef}
-            type="password"
-            label="Password"
-            name="password"
-          />
-          <Button onClick={onSubmit} variant="contained">
-            Login
-          </Button>
-          {error && <Typography sx={{ color: "red" }}>{error}</Typography>}
-        </Box>
-      </Box>
-    </Container>
+          <Typography component="h1" variant="h4" sx={{ mb: 3, fontWeight: 700, color: "#1e3c72" }}>
+            Welcome Back
+          </Typography>
+          <Box component="form" sx={{ width: "100%", mt: 1 }}>
+            <TextField
+              inputRef={emailRef}
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              autoFocus
+            />
+            <TextField
+              inputRef={passwordRef}
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+            />
+            {error && (
+              <Typography color="error" variant="body2" sx={{ mt: 2, textAlign: "center" }}>
+                {error}
+              </Typography>
+            )}
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={onSubmit}
+              sx={{
+                mt: 3,
+                mb: 2,
+                py: 1.5,
+                fontWeight: 600,
+                backgroundColor: "#1e3c72",
+                "&:hover": {
+                  backgroundColor: "#2a5298",
+                },
+              }}
+            >
+              Sign In
+            </Button>
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <Button
+                onClick={() => navigate("/register")}
+                sx={{ textTransform: "none", color: "#666" }}
+              >
+                Don't have an account? Sign Up
+              </Button>
+            </Box>
+          </Box>
+        </Paper>
+      </Container>
+    </Box>
   );
 };
 

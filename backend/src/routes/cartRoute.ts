@@ -18,7 +18,7 @@ router.get("/", validateJWT, async (req: ExtendRequest, res) => {
     const cart = await getActiveCartForUser({ userId, populateProduct: true });
     res.status(200).send(cart);
   } catch (err) {
-    res.status(500).send("Something went wrong!");
+    res.status(500).json({ error: "Something went wrong!" });
   }
 });
 
@@ -28,7 +28,7 @@ router.delete("/", validateJWT, async (req: ExtendRequest, res) => {
     const response = await clearCart({ userId });
     res.status(response.statusCode).send(response.data);
   } catch {
-    res.status(500).send("Something went wrong!");
+    res.status(500).json({ error: "Something went wrong!" });
   }
 });
 
@@ -39,7 +39,7 @@ router.post("/items", validateJWT, async (req: ExtendRequest, res) => {
     const response = await addItemToCart({ userId, productId, quantity });
     res.status(response.statusCode).send(response.data);
   } catch {
-    res.status(500).send("Something went wrong!");
+    res.status(500).json({ error: "Something went wrong!" });
   }
 });
 
@@ -50,7 +50,7 @@ router.put("/items", validateJWT, async (req: ExtendRequest, res) => {
     const response = await updateItemInCart({ userId, productId, quantity });
     res.status(response.statusCode).send(response.data);
   } catch {
-    res.status(500).send("Something went wrong!");
+    res.status(500).json({ error: "Something went wrong!" });
   }
 });
 
@@ -64,7 +64,7 @@ router.delete(
       const response = await deleteItemIncart({ userId, productId });
       res.status(response.statusCode).send(response.data);
     } catch {
-      res.status(500).send("Something went wrong!");
+      res.status(500).json({ error: "Something went wrong!" });
     }
   }
 );
@@ -76,7 +76,7 @@ router.post("/checkout", validateJWT, async (req: ExtendRequest, res) => {
     const response = await checkout({ userId, address });
     res.status(response.statusCode).send(response.data);
   } catch {
-    res.status(500).send("Something went wrong!");
+    res.status(500).json({ error: "Something went wrong!" });
   }
 });
 
